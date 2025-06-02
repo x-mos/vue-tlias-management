@@ -1,0 +1,171 @@
+<!-- 员工管理 -->
+<script setup>
+import { onMounted, ref } from "vue";
+import {
+  queryEmpListApi,
+  addEmpApi,
+  updateEmpApi,
+  deleteEmpApi,
+  queryEmpInfoApi
+} from "@/api/emp";
+import { ElMessage, ElMessageBox } from "element-plus";
+import { DeleteFilled, EditPen } from "@element-plus/icons-vue";
+
+const empList = ref([]);
+const dialogFormVisible = ref(false);
+const formTitle = ref("");
+const emp = ref({});
+const empFormRef = ref();
+
+const rules = ref({
+  username: [{ required: true, message: "用户名是必填项", trigger: "blur" }],
+  name: [{ required: true, message: "姓名是必填项", trigger: "blur" }],
+  gender: [{ required: true, message: "性别不能为空", trigger: "change" }],
+  job: [{ required: true, message: "职位不能为空", trigger: "change" }],
+});
+
+const search = async () => {
+  const result = await queryEmpListApi({ page: 1, pageSize: 100 });
+  if (result.code === 1) {
+    empList.value = result.data.rows;
+  } else {
+    ElMessage.error("获取员工数据失败：" + result.msg);
+  }
+};
+
+onMounted(() => {
+  search();
+});
+
+const addEmp = () => {
+  formTitle.value = "新增员工";
+  emp.value = {};
+  dialogFormVisible.value = true;
+  if (empFormRef.value) {
+    empFormRef.value.resetFields();
+  }
+};
+
+const editEmp = async (id) => {
+  formTitle.value = "修改员工";
+  const result = await queryEmpInfoApi(id);
+  if (result.code === 1) {
+    emp.value = result.data;
+    dialogFormVisible.value = true;
+    if (empFormRef.value) {
+      empFormRef.value.resetFields();
+    }
+  }
+};
+
+const saveEmp = () => {
+  if (!empFormRef.value) return;
+  empFormRef.value.validate(async (valid) => {
+    if (valid) {
+      let result;
+      if (emp.value.id) {
+        result = await updateEmpApi(emp.value);
+      } else {
+        result = await addEmpApi(emp.value);
+      }
+      if (result.code === 1) {
+        ElMessage.success("操作成功");
+        dialogFormVisible.value = false;
+        search();
+      } else {
+        ElMessage.error(result.msg);
+      }
+    }
+  });
+};
+
+const delEmp = async (id) => {
+  ElMessageBox.confirm("您确认要删除该员工吗？", "提示", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "warning",
+  })
+    .then(async () => {
+      const result = await deleteEmpApi([id]);
+      if (result.code === 1) {
+        ElMessage.success("删除成功");
+        search();
+      } else {
+        ElMessage.error(result.msg);
+      }
+    })
+    .catch(() => {
+      ElMessage.info("已取消删除");
+    });
+};
+</script>
+
+<template>
+  <h1>员工管理</h1>
+  <div class="container">
+    <el-button type="primary" @click="addEmp">+ 新增员工</el-button>
+  </div>
+  <div class="container">
+    <el-table :data="empList" border style="width: 100%">
+      <el-table-column type="index" label="序号" width="60" align="center" />
+      <el-table-column prop="username" label="用户名" width="120" />
+      <el-table-column prop="name" label="姓名" width="120" />
+      <el-table-column prop="gender" label="性别" width="80">
+        <template #default="scope">{{ scope.row.gender === 1 ? '男' : '女' }}</template>
+      </el-table-column>
+      <el-table-column prop="job" label="职位" width="100" />
+      <el-table-column prop="salary" label="薪资" width="100" />
+      <el-table-column prop="entryDate" label="入职日期" width="120" />
+      <el-table-column prop="deptName" label="部门" width="150" />
+      <el-table-column prop="updateTime" label="最后操作时间" />
+      <el-table-column label="操作" width="180" align="center">
+        <template #default="scope">
+          <el-button size="small" type="primary" @click="editEmp(scope.row.id)">
+            <el-icon><EditPen /></el-icon> 编辑
+          </el-button>
+          <el-button size="small" type="danger" @click="delEmp(scope.row.id)">
+            <el-icon><DeleteFilled /></el-icon> 删除
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+  </div>
+
+  <el-dialog v-model="dialogFormVisible" :title="formTitle" width="500px">
+    <el-form :model="emp" :rules="rules" ref="empFormRef" label-width="80px">
+      <el-form-item label="用户名" prop="username">
+        <el-input v-model="emp.username" />
+      </el-form-item>
+      <el-form-item label="姓名" prop="name">
+        <el-input v-model="emp.name" />
+      </el-form-item>
+      <el-form-item label="性别" prop="gender">
+        <el-select v-model="emp.gender" placeholder="请选择性别">
+          <el-option label="男" :value="1" />
+          <el-option label="女" :value="2" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="职位" prop="job">
+        <el-input v-model="emp.job" />
+      </el-form-item>
+      <el-form-item label="薪资">
+        <el-input v-model="emp.salary" />
+      </el-form-item>
+      <el-form-item label="入职日期">
+        <el-date-picker v-model="emp.entryDate" type="date" placeholder="请选择日期" />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取消</el-button>
+        <el-button type="primary" @click="saveEmp">确定</el-button>
+      </span>
+    </template>
+  </el-dialog>
+</template>
+
+<style scoped>
+.container {
+  margin: 10px 0;
+}
+</style>

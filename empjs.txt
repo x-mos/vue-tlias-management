@@ -1,0 +1,46 @@
+// src/api/emp.js
+import request from '@/utils/request'
+
+// 查询员工列表（带分页）
+export const queryEmpListApi = (params) => {
+  return request({
+    url: '/emps',
+    method: 'get',
+    params
+  })
+}
+
+// 添加员工
+export const addEmpApi = (data) => {
+  return request({
+    url: '/emps',
+    method: 'post',
+    data
+  })
+}
+
+// 修改员工
+export const updateEmpApi = (data) => {
+  return request({
+    url: '/emps',
+    method: 'put',
+    data
+  })
+}
+
+// 删除员工（支持批量）
+export const deleteEmpApi = (ids) => {
+  return request({
+    url: '/emps',
+    method: 'delete',
+    params: { ids: ids.join(',') }
+  })
+}
+
+// 根据 ID 查询员工信息
+export const queryEmpInfoApi = (id) => {
+  return request({
+    url: `/emps/${id}`,
+    method: 'get'
+  })
+}
