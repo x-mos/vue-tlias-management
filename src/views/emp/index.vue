@@ -37,17 +37,17 @@ const jobOptions = [
 ];
 const jobMap = Object.fromEntries(jobOptions.map(i => [i.value, i.label]));
 
-// 头像上传
-const handleAvatarSuccess = (res) => {
-  emp.value.image = res.data;
-};
-const beforeAvatarUpload = (file) => {
-  const isJPG = file.type === "image/jpeg" || file.type === "image/png";
-  const isLt2M = file.size / 1024 / 1024 < 2;
-  if (!isJPG) ElMessage.error("头像必须为 JPG/PNG 格式！");
-  if (!isLt2M) ElMessage.error("头像大小不能超过 2MB！");
-  return isJPG && isLt2M;
-};
+// // 头像上传
+// const handleAvatarSuccess = (res) => {
+//   emp.value.image = res.data;
+// };
+// const beforeAvatarUpload = (file) => {
+//   const isJPG = file.type === "image/jpeg" || file.type === "image/png";
+//   const isLt2M = file.size / 1024 / 1024 < 2;
+//   if (!isJPG) ElMessage.error("头像必须为 JPG/PNG 格式！");
+//   if (!isLt2M) ElMessage.error("头像大小不能超过 2MB！");
+//   return isJPG && isLt2M;
+// };
 
 // 搜索与分页
 const searchParams = ref({
@@ -301,15 +301,21 @@ onMounted(() => {
         </template>
       </el-table-column>
       <el-table-column prop="image" label="头像" width="100" align="center">
-        <template #default="scope">
-          <img
-            v-if="scope.row.image"
-            :src="scope.row.image"
-            alt="头像"
-            style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"
-          />
-          <span v-else style="color: #999">无</span>
-        </template>
+
+        <img src="@/assets/avatar.jpg" alt="头像"
+             style="width: 40px; height: 40px;
+             border-radius: 50%; object-fit: cover;"
+        />
+
+<!--        <template #default="scope">-->
+<!--          <img-->
+<!--            v-if="scope.row.image"-->
+<!--            :src="scope.row.image"-->
+<!--            alt="头像"-->
+<!--            style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"-->
+<!--          />-->
+<!--          <span v-else style="color: #999">无</span>-->
+<!--        </template>-->
       </el-table-column>
       <el-table-column prop="deptName" label="部门名称" width="150" align="center" />
       <el-table-column prop="salary" label="薪资" width="100" align="center" />
@@ -363,24 +369,24 @@ onMounted(() => {
               <el-option v-for="d in deptOptions" :key="d.id" :label="d.name" :value="d.id" />
             </el-select>
           </el-form-item>
-          <el-form-item label="头像">
-            <el-upload
-              class="avatar-uploader"
-              action="http://localhost:8080/upload"
-              :show-file-list="false"
-              :on-success="handleAvatarSuccess"
-              :before-upload="beforeAvatarUpload"
-            >
-              <div class="avatar-wrapper">
-                <img v-if="emp.image" :src="emp.image" class="avatar-img" />
-                <div v-else class="avatar-placeholder">
-                  <el-icon class="plus-icon">
-                    <Plus />
-                  </el-icon>
-                </div>
-              </div>
-            </el-upload>
-          </el-form-item>
+<!--          <el-form-item label="头像">-->
+<!--            <el-upload-->
+<!--              class="avatar-uploader"-->
+<!--              action="http://localhost:8080/upload"-->
+<!--              :show-file-list="false"-->
+<!--              :on-success="handleAvatarSuccess"-->
+<!--              :before-upload="beforeAvatarUpload"-->
+<!--            >-->
+<!--              <div class="avatar-wrapper">-->
+<!--                <img v-if="emp.image" :src="emp.image" class="avatar-img" />-->
+<!--                <div v-else class="avatar-placeholder">-->
+<!--                  <el-icon class="plus-icon">-->
+<!--                    <Plus />-->
+<!--                  </el-icon>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </el-upload>-->
+<!--          </el-form-item>-->
         </el-col>
 
         <el-col :span="12">

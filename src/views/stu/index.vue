@@ -71,8 +71,11 @@ const pageParams = ref({
 // 动态获取班级列表
 const loadClazzList = async () => {
   const res = await queryClazzListApi();
-  if (res.code === 1 && Array.isArray(res.data)) {
+  if (res.code === 1) {
     clazzList.value = res.data;
+
+    console.log("新数据：" + clazzList.value.rows)
+
   } else {
     clazzList.value = [];
     ElMessage.error("班级列表获取失败");
@@ -228,7 +231,7 @@ onMounted(async () => {
     </el-form-item>
     <el-form-item label="班级">
       <el-select v-model="searchParams.clazzId" placeholder="请选择班级" clearable>
-        <el-option v-for="item in clazzList" :key="item.id" :label="item.name" :value="item.id" />
+        <el-option v-for="item in clazzList.rows" :key="item.id" :label="item.name" :value="item.id" />
       </el-select>
     </el-form-item>
     <el-form-item label="学历">
@@ -331,7 +334,7 @@ onMounted(async () => {
       <el-form-item label="班级" prop="clazzId">
         <el-select v-model="stu.clazzId" placeholder="请选择班级" clearable filterable>
           <el-option
-            v-for="item in clazzList"
+            v-for="item in clazzList.rows"
             :key="item.id"
             :label="item.name"
             :value="item.id"
